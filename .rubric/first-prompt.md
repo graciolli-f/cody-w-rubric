@@ -20,20 +20,17 @@ You are about to build a well-architected application using Rubric DSL to enforc
    - See what NOT to do
    - Learn from common anti-patterns
 
-5. **Architecture**: `.rubric/architecture-plan.yaml`
-   - Understand the layer structure
-   - See the dependency flow rules
-
-6. **Examples**: Review ALL files in `.rubric/examples/`
+5. **Examples**: Review ALL files in `.rubric/examples/`
    - See complete, working patterns
    - Understand how layers interact
 
 ## 🎯 Your Tasks (MUST Follow This Order)
 
 ### Phase 1: Architecture Setup
-1. Create the directory structure from `architecture-plan.yaml`
-2. Create `src/types/index.ts` for shared types
-3. Create `src/config/environment.ts` for configuration
+1. Create a yaml file with the directory structure `architecture-plan.yaml`
+2. Create the directory tree in the root following the `architecture-plan.yaml`
+3. Create `src/types/index.ts` for shared types
+4. Create `src/config/environment.ts` for configuration
 
 ### Phase 2: Generate Rubric Specifications
 Create .rux files in `.rubric/constraints/` for your modules:
@@ -115,6 +112,7 @@ Before writing ANY application code:
 ## 🎉 Success Criteria
 
 You'll know you've succeeded when:
+TODO: make this a symbolic validation?
 1. Every file has a corresponding .rux specification
 2. `node validate.js` passes with zero violations
 3. Features can be added without modifying constraints
