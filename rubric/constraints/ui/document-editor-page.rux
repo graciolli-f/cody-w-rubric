@@ -16,6 +16,7 @@ module DocumentEditorPage {
     allow "../stores/document-store" as {useDocumentStore}
     allow "../components/DocumentEditor" as {DocumentEditor}
     allow "../components/LoadingSpinner" as {LoadingSpinner}
+    allow "../components/VersionHistory" as {VersionHistory}
   }
   
   constraints {

@@ -3,12 +3,15 @@ import {
   fetchDocument as supabaseFetchDocument,
   createDocument as supabaseCreateDocument,
   updateDocument as supabaseUpdateDocument,
-  deleteDocument as supabaseDeleteDocument
+  deleteDocument as supabaseDeleteDocument,
+  fetchDocumentVersions as supabaseFetchDocumentVersions,
+  restoreDocumentVersion as supabaseRestoreDocumentVersion
 } from '../lib/supabase'
-import type { Document } from '../types'
+import type { Document, DocumentVersion } from '../types'
 
 // Private state
 const _cache = new Map<string, Document>()
+const _versionCache = new Map<string, DocumentVersion[]>()
 let _lastFetch = 0
 
 /**
@@ -82,6 +85,9 @@ export async function updateDocument(id: string, updates: Partial<Document>, use
       if (sanitizedUpdates.content !== undefined) updatedDoc.content = sanitizedUpdates.content
       _cache.set(id, updatedDoc)
     }
+    
+    // Clear version cache for this document to force refresh
+    _versionCache.delete(id)
   } catch (error) {
     throw new Error(`Failed to update document: ${(error as Error).message}`)
   }
@@ -94,8 +100,46 @@ export async function deleteDocument(id: string, userId: string): Promise<void> 
   try {
     await supabaseDeleteDocument(id, userId)
     _cache.delete(id)
+    _versionCache.delete(id)
   } catch (error) {
     throw new Error(`Failed to delete document: ${(error as Error).message}`)
+  }
+}
+
+/**
+ * Fetch all versions for a document
+ */
+export async function fetchDocumentVersions(documentId: string): Promise<DocumentVersion[]> {
+  try {
+    // Check cache first
+    if (_versionCache.has(documentId)) {
+      return _versionCache.get(documentId)!
+    }
+    
+    const versions = await supabaseFetchDocumentVersions(documentId)
+    _versionCache.set(documentId, versions)
+    return versions
+  } catch (error) {
+    throw new Error(`Failed to fetch document versions: ${(error as Error).message}`)
+  }
+}
+
+/**
+ * Restore a document to a specific version
+ */
+export async function restoreDocumentVersion(
+  documentId: string, 
+  versionId: string, 
+  userId: string
+): Promise<void> {
+  try {
+    await supabaseRestoreDocumentVersion(documentId, versionId, userId)
+    
+    // Clear caches to force refresh
+    _cache.delete(documentId)
+    _versionCache.delete(documentId)
+  } catch (error) {
+    throw new Error(`Failed to restore document version: ${(error as Error).message}`)
   }
 }
 

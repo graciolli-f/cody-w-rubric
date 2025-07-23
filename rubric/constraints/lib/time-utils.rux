@@ -1,0 +1,27 @@
+module TimeUtils {
+  @ "Utility functions for time formatting and manipulation.
+  @ Provides relative time formatting and date grouping for version history.
+  @ Pure functions with no external dependencies."
+  
+  location: "src/lib/time-utils.ts"
+  
+  interface {
+    public formatRelativeTime(date: string | Date) -> string
+    public formatAbsoluteTime(date: string | Date) -> string
+    public groupVersionsByDay(versions: DocumentVersion[]) -> Map<string, DocumentVersion[]>
+    public isToday(date: string | Date) -> boolean
+    public isYesterday(date: string | Date) -> boolean
+  }
+  
+  imports {
+    allow "../types" as {DocumentVersion}
+  }
+  
+  constraints {
+    deny io.*                      @ "Pure utility functions only"
+    deny imports ["react", "vue"]  @ "Framework-agnostic utilities"
+    deny imports ["../services/*"] @ "No service dependencies"
+    deny imports ["../stores/*"]   @ "No store dependencies"
+    deny file.lines > 200          @ "Keep utilities focused"
+  }
+} 

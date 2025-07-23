@@ -4,6 +4,7 @@ import { useAuthStore } from '../stores/auth-store'
 import { useDocumentStore } from '../stores/document-store'
 import { DocumentEditor } from '../components/DocumentEditor'
 import { LoadingSpinner } from '../components/LoadingSpinner'
+import { VersionHistory } from '../components/VersionHistory'
 
 /**
  * Document editor page component
@@ -18,6 +19,7 @@ export function DocumentEditorPage() {
     error, 
     fetchDocument, 
     updateDocument,
+    restoreDocumentVersion,
     clearError,
     clearCurrentDocument
   } = useDocumentStore()
@@ -25,6 +27,7 @@ export function DocumentEditorPage() {
   const [title, setTitle] = useState('')
   const [isEditingTitle, setIsEditingTitle] = useState(false)
   const [lastSaved, setLastSaved] = useState<Date | null>(null)
+  const [isVersionHistoryOpen, setIsVersionHistoryOpen] = useState(false)
 
   useEffect(() => {
     if (id && user) {
@@ -74,6 +77,17 @@ export function DocumentEditorPage() {
     } else if (e.key === 'Escape') {
       setTitle(currentDocument?.title || '')
       setIsEditingTitle(false)
+    }
+  }
+
+  const handleRestoreVersion = async (versionId: string) => {
+    if (!id || !user) return
+    
+    try {
+      await restoreDocumentVersion(id, versionId, user.id)
+      setLastSaved(new Date())
+    } catch (error) {
+      // Error handled by store
     }
   }
 
@@ -160,6 +174,26 @@ export function DocumentEditorPage() {
             </div>
             
             <div className="flex items-center space-x-4">
+              <button
+                onClick={() => setIsVersionHistoryOpen(true)}
+                className="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+              >
+                <svg
+                  className="mr-2 h-4 w-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
+                </svg>
+                Version History
+              </button>
+              
               <span className="text-sm text-gray-600">
                 {user?.email}
               </span>
@@ -183,6 +217,14 @@ export function DocumentEditorPage() {
           editable={true}
         />
       </main>
+
+      {/* Version History Modal */}
+      <VersionHistory
+        documentId={currentDocument.id}
+        isOpen={isVersionHistoryOpen}
+        onClose={() => setIsVersionHistoryOpen(false)}
+        onRestore={handleRestoreVersion}
+      />
     </div>
   )
 } 

@@ -239,7 +239,7 @@ class RubricValidator {
     console.log(`${colors.blue}🔍 Collaborative Document Editor - Rubric Validator${colors.reset}`);
     console.log('=' .repeat(60));
 
-    const ruxFiles = this.findRuxFiles('.rubric/constraints');
+    const ruxFiles = this.findRuxFiles('rubric/constraints');
     console.log(`Found ${ruxFiles.length} .rux constraint files\n`);
 
     for (const ruxFile of ruxFiles) {

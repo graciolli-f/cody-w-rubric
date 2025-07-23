@@ -1,4 +1,8 @@
-This code base uses Rubric (.rubric/) for consistant, maintainable architecture. 
+**YOU MUST USE RUBRIC ARCHITECTURAL STANDARDS AND GUIDELINES FOR EVERY FEATURE IMPLEMENTATION, DELETION, MODIFICATION, REFACTORING**
+
+**BEFORE CREATING A NEW FILE, YOU MUST FIRST CREATE A CORRESPONDING RUX FILE**
+
+**AFTER IMPLEMENTATION, YOU MUST RUN `node rubric/validate.js` AND ALL CONDITIONS MUST PASS**
 
 Code Quality:
 - Functions should do one thing
@@ -19,4 +23,4 @@ Performance:
 - Implement caching where beneficial
 - Minimize API calls from the frontend
 
-Please ensure the code is production-ready and maintainable.
+Please ensure the code is production-ready and maintainable following the instructions in the rubric/ directory.

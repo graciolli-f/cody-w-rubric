@@ -1,0 +1,31 @@
+module VersionHistory {
+  @ "Version history component that displays document versions in a modal.
+  @ Shows versions with timestamps, user info, change descriptions, and content previews.
+  @ Allows viewing and restoring previous versions."
+  
+  location: "src/components/VersionHistory.tsx"
+  
+  interface {
+    public VersionHistory(props: {
+      documentId: string,
+      isOpen: boolean,
+      onClose: () -> void,
+      onRestore: (versionId: string) -> void
+    }) -> JSX.Element
+  }
+  
+  imports {
+    allow "react" as external
+    allow "../stores/document-store" as {useDocumentStore}
+    allow "../lib/time-utils" as {formatRelativeTime, groupVersionsByDay}
+    allow "../types" as {DocumentVersion}
+  }
+  
+  constraints {
+    deny io.network.*              @ "Components should not make API calls"
+    deny imports ["../services/*"] @ "Components should not know about services"
+    deny imports ["../lib/supabase"] @ "Components should not access data layer"
+    deny io.console.*              @ "No console logging in UI"
+    deny file.lines > 300          @ "Keep components manageable"
+  }
+} 

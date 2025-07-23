@@ -24,6 +24,26 @@ export interface Document {
 }
 
 /**
+ * Document version type for version history
+ */
+export interface DocumentVersion {
+  id: string
+  document_id: string
+  title: string
+  content: string
+  version_number: number
+  change_description: string
+  created_at: string
+  created_by: string
+  created_by_email: string
+}
+
+/**
+ * Version change types for describing what changed
+ */
+export type VersionChangeType = 'created' | 'title_updated' | 'content_modified' | 'restored'
+
+/**
  * Authentication response from Supabase
  */
 export interface AuthResponse {
