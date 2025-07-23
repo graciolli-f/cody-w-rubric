@@ -1,0 +1,37 @@
+@ EXAMPLE FILE ONLY
+
+module ProductService {
+  @ "Handles all product-related business operations.
+  @ This service is the single source of truth for product data access.
+  @ It enforces business rules like pricing, availability, and inventory."
+  
+  location: "src/services/product-service.ts"
+  
+  interface {
+    public fetchAll(filters?: ProductFilters) -> Promise<Product[]>
+    public fetchById(id: string) -> Promise<Product?>
+    public fetchByCategory(categoryId: string) -> Promise<Product[]>
+    public search(query: string) -> Promise<Product[]>
+    public checkAvailability(productId: string, quantity: number) -> Promise<boolean>
+    public updateInventory(productId: string, adjustment: number) -> Promise<void>
+  }
+  
+  state {
+    private _cache: Map<string, Product>
+    private _cacheExpiry: number
+  }
+  
+  imports {
+    allow "../data/supabase-client" as {getClient}
+    allow "../types" as {Product, ProductFilters}
+    allow "../utils/cache" as {CacheManager}
+  }
+  
+  constraints {
+    deny imports ["react", "../components/*", "../pages/*"] @ "Services are UI-agnostic"
+    deny imports ["../stores/*"]                            @ "Services don't know about stores"
+    deny exports ["_*", "getClient"]                        @ "Hide implementation details"
+    deny io.console.*                                       @ "Use proper logging service"
+    deny direct.database.*                                  @ "Must use getClient() for DB access"
+  }
+}

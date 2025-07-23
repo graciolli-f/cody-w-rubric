@@ -1,0 +1,131 @@
+# EXAMPLE FILE FOR ARCHITECTURE PLAN
+# Architecture Plan - E-Commerce Application
+# This defines the layer structure and boundaries
+
+application:
+  name: "E-Commerce Platform"
+  description: "Multi-layered architecture with strict boundaries"
+  
+layers:
+  data:
+    purpose: "Database access and external API integrations"
+    location: "src/data/"
+    responsibilities:
+      - "Supabase client configuration"
+      - "External API clients (payment, shipping)"
+      - "Raw data access methods"
+    constraints:
+      - "No business logic"
+      - "No UI imports"
+      - "Framework agnostic"
+    modules:
+      - "supabase-client"
+      - "stripe-client"
+      - "shipping-api-client"
+    
+  services:
+    purpose: "Business logic and domain operations"
+    location: "src/services/"
+    responsibilities:
+      - "Business rule enforcement"
+      - "Data validation and transformation"
+      - "Cross-entity operations"
+      - "Third-party service orchestration"
+    constraints:
+      - "No UI framework imports"
+      - "No direct database queries (use data layer)"
+      - "No state management"
+    modules:
+      - "product-service"
+      - "cart-service"
+      - "order-service"
+      - "payment-service"
+      - "inventory-service"
+      - "discount-service"
+      - "auth-service"
+    
+  stores:
+    purpose: "State management and UI-service coordination"
+    location: "src/stores/"
+    responsibilities:
+      - "Application state management"
+      - "Caching and optimistic updates"
+      - "Coordinating service calls"
+      - "Providing hooks for components"
+    constraints:
+      - "Must use Zustand"
+      - "Cannot skip service layer"
+      - "No direct data layer access"
+      - "No business calculations"
+    modules:
+      - "auth-store"
+      - "product-store"
+      - "cart-store"
+      - "ui-store"
+      - "notification-store"
+    
+  ui:
+    purpose: "React components and pages"
+    location: 
+      - "src/components/"
+      - "src/pages/"
+    responsibilities:
+      - "Presentation logic only"
+      - "User interaction handling"
+      - "Responsive design"
+      - "Accessibility"
+    constraints:
+      - "No service imports"
+      - "No business logic"
+      - "Use stores for all data"
+      - "Components under 150 lines"
+    component_categories:
+      - "components/products/" # Product display components
+      - "components/cart/"     # Cart UI components
+      - "components/checkout/" # Checkout flow components
+      - "components/ui/"       # Reusable UI primitives
+      - "pages/"              # Next.js pages
+
+  utils:
+    purpose: "Shared utilities and helpers"
+    location: "src/utils/"
+    responsibilities:
+      - "Pure utility functions"
+      - "Formatters and parsers"
+      - "Constants and enums"
+      - "Type definitions"
+    constraints:
+      - "No side effects"
+      - "No external dependencies"
+      - "Must be pure functions"
+    modules:
+      - "formatters"
+      - "validators"
+      - "constants"
+      - "calculations"
+
+# Allowed dependency flow (top to bottom only)
+dependency_rules:
+  - "UI → Stores"
+  - "Stores → Services"  
+  - "Services → Data"
+  - "All layers → Utils"
+  
+forbidden_patterns:
+  - "UI → Services (must go through stores)"
+  - "UI → Data (must go through stores → services)"
+  - "Stores → Data (must go through services)"
+  - "Services → UI (services are UI-agnostic)"
+  - "Data → * (data layer has no dependencies)"
+  
+testing_structure:
+  unit_tests:
+    - "Each module has corresponding .test.ts file"
+    - "Services tested with mocked data layer"
+    - "Stores tested with mocked services"
+    - "Components tested with mocked stores"
+    
+  integration_tests:
+    - "Test service + data layer together"
+    - "Test store + service integration"
+    - "Test critical user flows"

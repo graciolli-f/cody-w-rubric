@@ -1,0 +1,32 @@
+@ EXAMPLE FILE ONLY 
+
+module SupabaseClient {
+  @ "Centralized Supabase client configuration and access.
+  @ This is the ONLY module that should import from @supabase/supabase-js.
+  @ All database operations must go through service layer, not use this directly."
+  
+  location: "src/data/supabase-client.ts"
+  
+  interface {
+    @ "Export only the typed client, not the raw Supabase instance"
+    public getClient() -> SupabaseClient
+    public isAuthenticated() -> Promise<boolean>
+  }
+  
+  state {
+    private _client: SupabaseClient
+    private _initialized: boolean
+  }
+  
+  imports {
+    allow "@supabase/supabase-js" as external
+    allow "../config/environment" as {SUPABASE_URL, SUPABASE_ANON_KEY}
+  }
+  
+  constraints {
+    deny imports ["react", "vue", "@angular"]  @ "Data layer is framework-agnostic"
+    deny exports ["createClient"]              @ "Don't expose Supabase internals"
+    deny exports ["_*"]                        @ "No private members"
+    allow io.network.*                         @ "This module manages the connection"
+  }
+}

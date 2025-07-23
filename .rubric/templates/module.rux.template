@@ -1,0 +1,59 @@
+ module [ModuleName] {
+  @ "[Primary purpose of this module]
+  @ [Additional context or important notes]"
+  
+  location: "src/[layer]/[filename].ts"
+  
+  interface {
+    @ "Public API - what other modules can use"
+    public [methodName]([paramName]: [Type]) -> [ReturnType]
+    public get [propertyName]() -> [Type]
+  }
+  
+  state {
+    @ "Private implementation details"
+    private _[stateName]: [Type]
+  }
+  
+  imports {
+    allow "[package-name]" as external
+    allow "../[relative-path]" as {[NamedImport]}
+    deny "[pattern]"  @ "Reason why this is forbidden"
+  }
+  
+  constraints {
+    deny io.console.*         @ "Use logging service instead"
+    deny io.network.*         @ "Network calls go through [where?]"
+    deny imports ["[pattern]"] @ "Explanation"
+    deny exports ["_*"]       @ "Keep private members private"
+    deny file.lines > [200]   @ "Keep modules focused"
+  }
+}
+
+# Template Usage Instructions:
+# 1. Replace all [placeholders] with actual values
+# 2. Remove any sections that don't apply
+# 3. Add constraints specific to your module type
+# 4. Ensure all @ comments explain the "why"
+
+# Common constraint patterns by layer:
+
+# Data Layer:
+#   - allow io.network.* (can make API calls)
+#   - deny imports ["../services", "../stores", "react"]
+#   - Framework agnostic
+
+# Service Layer:
+#   - deny io.network.* (use data layer)
+#   - deny imports ["react", "../components", "../stores"]
+#   - Business logic only
+
+# Store Layer:
+#   - deny imports ["../data/*"] (must use services)
+#   - allow imports ["zustand"]
+#   - State management only
+
+# UI Layer:
+#   - deny imports ["../services/*", "../data/*"]
+#   - deny io.network.*
+#   - Presentation only

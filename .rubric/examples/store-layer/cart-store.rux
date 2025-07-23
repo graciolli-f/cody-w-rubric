@@ -1,0 +1,48 @@
+@ EXAMPLE FILE ONLY
+
+module CartStore {
+  @ "Global shopping cart state management using Zustand.
+  @ Provides cart operations to UI components while handling async service calls.
+  @ Manages optimistic updates for better UX."
+  
+  location: "src/stores/cart-store.ts"
+  
+  interface {
+    public useCartStore() -> {
+      items: CartItem[],
+      totals: CartTotals,
+      loading: boolean,
+      addItem: (productId: string, quantity: number) -> Promise<void>,
+      removeItem: (itemId: string) -> Promise<void>,
+      updateQuantity: (itemId: string, quantity: number) -> Promise<void>,
+      applyDiscount: (code: string) -> Promise<boolean>,
+      checkout: () -> Promise<Order?>,
+      clearCart: () -> void
+    }
+  }
+  
+  state {
+    private _items: CartItem[]
+    private _totals: CartTotals
+    private _discountCode: string?
+    private _loading: boolean
+    private _userId: string?
+  }
+  
+  imports {
+    allow "zustand" as external
+    allow "zustand/middleware" as {persist, devtools}
+    allow "../services/cart-service" as {CartService}
+    allow "../services/order-service" as {OrderService}
+    allow "../services/auth-service" as {AuthService}
+    allow "../types" as {Cart, CartItem, CartTotals, Order}
+  }
+  
+  constraints {
+    deny imports ["../components/*", "../pages/*"]  @ "Stores are UI-agnostic"
+    deny imports ["../data/*"]                      @ "Must use service layer"
+    deny exports ["_*", "setState", "getState"]     @ "Hide implementation"
+    deny calculations.tax                           @ "Tax calc belongs in service"
+    allow io.localStorage["cart-backup"]             @ "Can backup cart locally"
+  }
+}
