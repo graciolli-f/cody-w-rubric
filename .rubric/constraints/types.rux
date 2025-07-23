@@ -1,0 +1,25 @@
+module Types {
+  @ "Shared TypeScript type definitions used across all application layers.
+  @ Contains data models and interface types.
+  @ Should be pure types with no implementation logic."
+  
+  location: "src/types/index.ts"
+  
+  interface {
+    public type User
+    public type Document
+    public type AuthResponse
+    public type DocumentPermission
+  }
+  
+  imports {
+    allow "@supabase/supabase-js" as external
+  }
+  
+  constraints {
+    deny io.*                                      @ "Types should not contain any I/O operations"
+    deny imports ["react", "zustand"]             @ "Types should be framework-agnostic"
+    deny exports.functions                         @ "Only export types, not functions"
+    deny file.lines > 100                         @ "Keep types file focused"
+  }
+} 

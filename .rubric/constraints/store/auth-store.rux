@@ -1,0 +1,38 @@
+module AuthStore {
+  @ "Global authentication state management using Zustand.
+  @ Coordinates between AuthService and UI components.
+  @ Manages loading states and error handling for auth operations."
+  
+  location: "src/stores/auth-store.ts"
+  
+  interface {
+    public useAuthStore() -> {
+      user: User?,
+      loading: boolean,
+      error: string?,
+      signIn: (email: string, password: string) -> Promise<void>,
+      signUp: (email: string, password: string) -> Promise<void>,
+      signOut: () -> Promise<void>,
+      clearError: () -> void
+    }
+  }
+  
+  state {
+    private _user: User?
+    private _loading: boolean
+    private _error: string?
+  }
+  
+  imports {
+    allow "zustand" as external
+    allow "../services/auth-service" as {AuthService}
+    allow "../types" as {User}
+  }
+  
+  constraints {
+    deny io.network.*                              @ "Use AuthService for API calls"
+    deny imports ["../lib/supabase"]               @ "Don't bypass service layer"
+    deny imports ["react", "../components/*", "../pages/*"] @ "Stores are framework-agnostic"
+    deny exports ["_user", "_loading", "_error"]  @ "Keep internal state private"
+  }
+} 

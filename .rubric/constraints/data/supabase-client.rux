@@ -1,0 +1,35 @@
+module SupabaseClient {
+  @ "Single source of truth for all Supabase database operations.
+  @ This is the ONLY module allowed to directly interact with Supabase.
+  @ All database operations must go through this module."
+  
+  location: "src/lib/supabase.ts"
+  
+  interface {
+    public supabase -> SupabaseClient
+    public createDocument(title: string, content: string, userId: string) -> Promise<Document>
+    public fetchDocuments(userId: string) -> Promise<Document[]>
+    public fetchDocument(id: string, userId: string) -> Promise<Document?>
+    public updateDocument(id: string, updates: Partial<Document>, userId: string) -> Promise<void>
+    public deleteDocument(id: string, userId: string) -> Promise<void>
+    public signIn(email: string, password: string) -> Promise<AuthResponse>
+    public signUp(email: string, password: string) -> Promise<AuthResponse>
+    public signOut() -> Promise<void>
+    public getCurrentUser() -> User?
+  }
+  
+  state {
+    private _client: SupabaseClient
+    private _cache: Map<string, Document>
+  }
+  
+  imports {
+    allow "@supabase/supabase-js" as external
+    allow "../types" as {Document, User, AuthResponse}
+  }
+  
+  constraints {
+    deny exports ["_client", "_cache"]     @ "Don't expose internal Supabase client"
+    deny imports ["react", "../components/*", "../pages/*", "../stores/*"] @ "Data layer is framework-agnostic"
+  }
+} 

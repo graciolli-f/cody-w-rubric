@@ -1,0 +1,27 @@
+module SignupPage {
+  @ "Signup page for new user registration.
+  @ Should remain pure UI component with no business logic.
+  @ Uses AuthStore for all authentication operations."
+  
+  location: "src/pages/SignupPage.tsx"
+  
+  interface {
+    public SignupPage() -> JSX.Element
+  }
+  
+  imports {
+    allow "react" as external
+    allow "react-router-dom" as external
+    allow "../stores/auth-store" as {useAuthStore}
+    allow "../components/AuthForm" as {AuthForm}
+    allow "../components/LoadingSpinner" as {LoadingSpinner}
+  }
+  
+  constraints {
+    deny io.network.*                              @ "Pages should not make API calls"
+    deny imports ["../services/*"]                 @ "Pages should not know about services"
+    deny imports ["../lib/supabase"]               @ "Pages should not access data layer"
+    deny io.console.*                              @ "No console logging in UI"
+    deny file.lines > 200                         @ "Keep pages focused and readable"
+  }
+} 

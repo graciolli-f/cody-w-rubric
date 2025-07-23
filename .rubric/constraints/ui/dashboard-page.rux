@@ -1,0 +1,29 @@
+module DashboardPage {
+  @ "Dashboard page displaying user's document list with CRUD operations.
+  @ Should remain pure UI with all business logic handled by stores.
+  @ Manages loading states and user interactions."
+  
+  location: "src/pages/DashboardPage.tsx"
+  
+  interface {
+    public DashboardPage() -> JSX.Element
+  }
+  
+  imports {
+    allow "react" as external
+    allow "react-router-dom" as external
+    allow "../stores/auth-store" as {useAuthStore}
+    allow "../stores/document-store" as {useDocumentStore}
+    allow "../components/DocumentList" as {DocumentList}
+    allow "../components/CreateDocumentForm" as {CreateDocumentForm}
+    allow "../components/LoadingSpinner" as {LoadingSpinner}
+  }
+  
+  constraints {
+    deny io.network.*                              @ "Pages should not make API calls"
+    deny imports ["../services/*"]                 @ "Pages should not know about services"
+    deny imports ["../lib/supabase"]               @ "Pages should not access data layer"
+    deny io.console.*                              @ "No console logging in UI"
+    deny file.lines > 250                         @ "Keep pages manageable"
+  }
+} 

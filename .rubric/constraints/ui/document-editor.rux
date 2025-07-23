@@ -1,0 +1,42 @@
+module DocumentEditor {
+  @ "Rich text editor component using Tiptap for document editing.
+  @ Should remain pure UI component focused only on editing experience.
+  @ Uses DocumentStore for save/load operations and state management."
+  
+  location: "src/components/DocumentEditor.tsx"
+  
+  interface {
+    public DocumentEditor(props: {
+      documentId: string,
+      initialContent?: string,
+      onSave?: (content: string) -> void,
+      editable?: boolean
+    }) -> JSX.Element
+  }
+  
+  imports {
+    allow "react" as external
+    allow "@tiptap/react" as external
+    allow "@tiptap/extension-document" as external
+    allow "@tiptap/extension-paragraph" as external
+    allow "@tiptap/extension-text" as external
+    allow "@tiptap/extension-bold" as external
+    allow "@tiptap/extension-italic" as external
+    allow "@tiptap/extension-underline" as external
+    allow "@tiptap/extension-heading" as external
+    allow "@tiptap/extension-bullet-list" as external
+    allow "@tiptap/extension-list-item" as external
+    allow "@tiptap/extension-code-block" as external
+    allow "@tiptap/extension-link" as external
+    allow "../stores/document-store" as {useDocumentStore}
+    allow "../stores/auth-store" as {useAuthStore}
+  }
+  
+  constraints {
+    deny io.network.*                              @ "Components should not make API calls"
+    deny imports ["../services/*"]                 @ "Components should not know about services"
+    deny imports ["../lib/supabase"]               @ "Components should not access data layer"
+    deny io.console.*                              @ "No console logging in UI"
+    deny file.lines > 200                         @ "Keep components focused and readable"
+  }
+} 

@@ -1,0 +1,32 @@
+module AuthService {
+  @ "Authentication business logic and operations.
+  @ Coordinates between SupabaseClient and authentication stores.
+  @ Handles auth state validation and session management."
+  
+  location: "src/services/auth-service.ts"
+  
+  interface {
+    public signIn(email: string, password: string) -> Promise<{user: User?, error?: string}>
+    public signUp(email: string, password: string) -> Promise<{user: User?, error?: string}>
+    public signOut() -> Promise<void>
+    public getCurrentUser() -> User?
+    public validateEmail(email: string) -> boolean
+    public validatePassword(password: string) -> {valid: boolean, message?: string}
+  }
+  
+  state {
+    private _currentUser: User?
+  }
+  
+  imports {
+    allow "../lib/supabase" as {SupabaseClient}
+    allow "../types" as {User}
+  }
+  
+  constraints {
+    deny io.console.*                              @ "No console logging in services"
+    deny imports ["react", "../components/*", "../pages/*"] @ "Services are framework-agnostic"
+    deny imports ["zustand", "../stores/*"]       @ "Services don't depend on stores"
+    deny exports ["_currentUser"]                 @ "Keep private state internal"
+  }
+} 

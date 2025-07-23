@@ -1,0 +1,28 @@
+module DocumentEditorPage {
+  @ "Document editor page that wraps the DocumentEditor component.
+  @ Handles document loading, title editing, and save states.
+  @ Should remain pure UI with business logic in stores."
+  
+  location: "src/pages/DocumentEditorPage.tsx"
+  
+  interface {
+    public DocumentEditorPage() -> JSX.Element
+  }
+  
+  imports {
+    allow "react" as external
+    allow "react-router-dom" as external
+    allow "../stores/auth-store" as {useAuthStore}
+    allow "../stores/document-store" as {useDocumentStore}
+    allow "../components/DocumentEditor" as {DocumentEditor}
+    allow "../components/LoadingSpinner" as {LoadingSpinner}
+  }
+  
+  constraints {
+    deny io.network.*                              @ "Pages should not make API calls"
+    deny imports ["../services/*"]                 @ "Pages should not know about services"
+    deny imports ["../lib/supabase"]               @ "Pages should not access data layer"
+    deny io.console.*                              @ "No console logging in UI"
+    deny file.lines > 300                         @ "Keep pages manageable"
+  }
+} 

@@ -1,0 +1,35 @@
+module DocumentService {
+  @ "Document business logic and CRUD operations.
+  @ Handles document validation, access control, and data transformations.
+  @ Single point for all document-related business rules."
+  
+  location: "src/services/document-service.ts"
+  
+  interface {
+    public fetchUserDocuments(userId: string) -> Promise<Document[]>
+    public fetchDocument(id: string, userId: string) -> Promise<Document?>
+    public createDocument(title: string, content: string, userId: string) -> Promise<Document>
+    public updateDocument(id: string, updates: Partial<Document>, userId: string) -> Promise<void>
+    public deleteDocument(id: string, userId: string) -> Promise<void>
+    public validateDocumentAccess(documentId: string, userId: string) -> Promise<boolean>
+    public sanitizeContent(content: string) -> string
+  }
+  
+  state {
+    private _cache: Map<string, Document>
+    private _lastFetch: number
+  }
+  
+  imports {
+    allow "../lib/supabase" as {SupabaseClient}
+    allow "../types" as {Document}
+  }
+  
+  constraints {
+    deny io.console.*                              @ "No console logging in services"
+    deny imports ["react", "../components/*", "../pages/*"] @ "Services are framework-agnostic"
+    deny imports ["zustand", "../stores/*"]       @ "Services don't depend on stores"
+    deny exports ["_cache", "_lastFetch"]         @ "Keep private state internal"
+    deny file.lines > 300                         @ "Keep service files focused and manageable"
+  }
+} 

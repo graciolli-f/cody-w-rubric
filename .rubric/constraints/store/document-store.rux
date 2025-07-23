@@ -1,0 +1,44 @@
+module DocumentStore {
+  @ "Global document state management using Zustand.
+  @ Coordinates between DocumentService and UI components.
+  @ Manages document list, current document, and operation states."
+  
+  location: "src/stores/document-store.ts"
+  
+  interface {
+    public useDocumentStore() -> {
+      documents: Document[],
+      currentDocument: Document?,
+      loading: boolean,
+      error: string?,
+      fetchDocuments: (userId: string) -> Promise<void>,
+      fetchDocument: (id: string, userId: string) -> Promise<void>,
+      createDocument: (title: string, content: string, userId: string) -> Promise<Document>,
+      updateDocument: (id: string, updates: Partial<Document>, userId: string) -> Promise<void>,
+      deleteDocument: (id: string, userId: string) -> Promise<void>,
+      clearError: () -> void,
+      clearCurrentDocument: () -> void
+    }
+  }
+  
+  state {
+    private _documents: Document[]
+    private _currentDocument: Document?
+    private _loading: boolean
+    private _error: string?
+  }
+  
+  imports {
+    allow "zustand" as external
+    allow "../services/document-service" as {DocumentService}
+    allow "../types" as {Document}
+  }
+  
+  constraints {
+    deny io.network.*                              @ "Use DocumentService for API calls"
+    deny imports ["../lib/supabase"]               @ "Don't bypass service layer"
+    deny imports ["react", "../components/*", "../pages/*"] @ "Stores are framework-agnostic"
+    deny exports ["_documents", "_currentDocument", "_loading", "_error"] @ "Keep internal state private"
+    deny file.lines > 250                         @ "Keep store files focused"
+  }
+} 

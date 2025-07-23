@@ -1,1 +1,22 @@
-This code base uses Rubric for consistant, maintainable architecture. 
+This code base uses Rubric (.rubric/) for consistant, maintainable architecture. 
+
+Code Quality:
+- Functions should do one thing
+- Keep files under 300 lines
+- Use meaningful variable names
+- Add JSDoc comments for public functions
+- Avoid global variables
+- Handle async operations properly
+
+Security:
+- Validate user input
+- Don't expose sensitive data in responses
+- Use environment variables for configuration
+- Implement proper authentication
+
+Performance:
+- Optimize database queries
+- Implement caching where beneficial
+- Minimize API calls from the frontend
+
+Please ensure the code is production-ready and maintainable.

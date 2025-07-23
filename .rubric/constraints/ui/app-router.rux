@@ -1,0 +1,30 @@
+module AppRouter {
+  @ "Main application component with routing and authentication guards.
+  @ Handles route protection and top-level layout.
+  @ Coordinates between auth state and route access."
+  
+  location: "src/App.tsx"
+  
+  interface {
+    public App() -> JSX.Element
+  }
+  
+  imports {
+    allow "react" as external
+    allow "react-router-dom" as external
+    allow "./stores/auth-store" as {useAuthStore}
+    allow "./pages/LoginPage" as {LoginPage}
+    allow "./pages/SignupPage" as {SignupPage}
+    allow "./pages/DashboardPage" as {DashboardPage}
+    allow "./pages/DocumentEditorPage" as {DocumentEditorPage}
+    allow "./components/ProtectedRoute" as {ProtectedRoute}
+  }
+  
+  constraints {
+    deny io.network.*                              @ "App should not make API calls"
+    deny imports ["./services/*"]                  @ "App should not know about services"
+    deny imports ["./lib/supabase"]                @ "App should not access data layer"
+    deny io.console.*                              @ "No console logging in UI"
+    deny file.lines > 150                         @ "Keep App component simple"
+  }
+} 
